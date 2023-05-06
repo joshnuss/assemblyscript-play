@@ -2,8 +2,11 @@
 	import '../app.css';
 	import { onMount } from 'svelte';
 	import asc from 'assemblyscript/asc';
+	import CodeMirror from "svelte-codemirror-editor";
+  import { javascript } from "@codemirror/lang-javascript";
+	import { wat } from '$lib/wat'
 
-	let source = `export function test(): void {\n}`;
+	let source = `export function add(a: u32, b: u32): u32 {\n  return a + b;\n}`;
 	let result = null;
 	let compiling = false;
 
@@ -11,19 +14,14 @@
 
 	onMount(compile);
 
-	async function handleKeypress(e) {
-		console.log('called');
-		console.log({ v: e.target.value });
-		source = e.target.value;
+	async function handleChange(e) {
+		source = e.detail;
 		compile();
 	}
 
 	async function compile() {
 		compiling = true;
 		result = await asc.compileString(source);
-
-		console.log(result);
-
 		compiling = false;
 	}
 
@@ -37,8 +35,21 @@
 </header>
 
 <main>
-	<textarea on:keyup={handleKeypress} value={source} />
-	<textarea value={result?.text ?? ''} readonly />
+	<div class="pane">
+		<CodeMirror
+			value={source}
+			lang={javascript({ typescript: true })}
+			on:change={handleChange}
+			/>
+	</div>
+
+	<div class="pane">
+		<CodeMirror
+			value={result?.text ?? ''}
+			lang={wat}
+			readonly
+		/>
+	</div>
 </main>
 
 {#if compiling || error}
@@ -47,7 +58,7 @@
 			Compiling...
 		{:else if error}
 			{#each formattedErrors() as error}
-				{error}<br />
+				{@html error.replace(/ /g, '&nbsp;')}<br/>
 			{/each}
 		{/if}
 	</footer>
@@ -58,16 +69,14 @@
 		display: flex;
 		flex: auto;
 	}
-	main textarea {
+	main .pane {
 		font-family: var(--font-mono);
+		font-size: var(--font-size-2);
 		border-radius: 0;
 		resize: none;
 		flex: 1;
 	}
-	main textarea:focus-visible {
-		outline: none;
-	}
-	main textarea:first-of-type {
+	main .pane:first-of-type {
 		border-right: solid var(--border-size-2) var(--gray-4);
 	}
 
@@ -89,6 +98,7 @@
 		z-index: 10;
 		background: var(--gray-4);
 		width: 100vw;
+		font-family: var(--font-mono);
 	}
 
 	.error {
