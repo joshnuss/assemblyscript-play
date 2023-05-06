@@ -21,7 +21,9 @@
 
   async function compile() {
     compiling = true
-    result = await asc.compileString(source)
+    result = await asc.compileString(source, {
+      optimizeLevel: 2
+    })
     compiling = false
   }
 
