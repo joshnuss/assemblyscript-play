@@ -31,7 +31,7 @@
 </script>
 
 <header>
-  AssemblyScript <em>Playground</em>
+  <a href="https://assemblyscript.org">AssemblyScript</a> <em>Playground</em>
 </header>
 
 <main>
@@ -77,6 +77,10 @@
     font-weight: bold;
     color: var(--blue-8);
     border-bottom: solid var(--size-1) var(--blue-2);
+  }
+
+  header a {
+    color:  inherit;
   }
   header em {
     font-style: normal;
